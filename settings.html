@@ -1,0 +1,35 @@
+<!doctype html>
+
+
+<h1 align="center"> Settings </h1>
+ <br>
+ <br>
+ <body>
+ <p> Here you can adjust your settings! The sliders will allow you to modify how you want to use the app. Check out the User Manual page for detailed information if you're confused! </p>
+ 
+ <br><br>
+ 
+ Adjust Scanning Radius (in miles): <input type="range" min="0" max="50" value="25" step="5" onchange="showNumber(this.value)" />
+ <span id="range">25</span>
+ 
+ <br>
+ Maximum Number of Items on Screen: <input type="range" min="0" max="20" value="10" onchange="showItemNumber(this.value)" />
+ <span id="itemCount">10</span>
+ 
+ 
+ <script type= "text/javascript">
+ function showNumber(newNumber)
+ {
+    document.getElementById("range").innerHTML=newNumber;
+ 
+ }
+ </script>
+ 
+ <script type= "text/javascript">
+ function showItemNumber(newNumber)
+ {
+    document.getElementById("itemCount").innerHTML=newNumber;
+ 
+ }
+ </script>
+ </body>
