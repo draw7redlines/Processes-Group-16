@@ -1,6 +1,6 @@
 <doctype html>
 
-<h1 align="center">Welcome to our wonderful map, courtesy of the google gods!</h1>
+<h1 align="center">Welcome to our wonderful map</h1>
 
 <body>
 
@@ -15,7 +15,16 @@ function myMap() {
     //eventually be updated to automaticall locate and change
     //the lat and long to the users exact position
         center: new google.maps.LatLng(28.6024, -81.2001),
-        zoom: 15
+        zoom: 15,
+        
+        
+        //disabled unnecessary map controls to keep it simple
+       disableDefaultUI: true,
+       zoomControl: true,
+       panControl: true,
+       scaleControl:true,
+       rotateControl: true
+       
     }
   var map = new google.maps.Map(mapCanvas, mapOptions);
   
@@ -38,8 +47,35 @@ function myMap() {
     fillOpacity: 0.4
   });
     scanRadiusDisplay.setMap(map);
-  
+ 
+ 
+        //Trying to make an instance for a nearby search of stores
+        var service = new google.maps.places.PlacesService(map);
+        service.nearbySearch({
+          location: mapOptions.center,
+          radius: 700,
+          type: ['palce_of_interest']
+        }, getMarkerParameters);
+
 }
+
+    //Trying to make a loop which will create x number of markers, where x is the number of results
+    function getMarkerParameters(results, status) {
+        if (status === google.maps.places.PlacesServiceStatus.OK) {
+          for (var i = 0; i < results.length; i++) {
+            addMarker(results[i]);
+          }
+        }
+      }
+
+      //This should add a marker to the location on the map
+      function addMarker(place) {
+        var marker = new google.maps.Marker({
+          map: myMap.map,
+          position: place.geometry.location
+        });
+      }
+
 
 </script>
 
