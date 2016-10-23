@@ -8,6 +8,8 @@
 
 <script>
 function myMap() {
+
+
   var mapCanvas = document.getElementById("map");
   var mapOptions = 
     {
@@ -42,7 +44,7 @@ function myMap() {
     radius: 200,
     strokeColor: "#008000",
     strokeOpacity: 0.9,
-    strokeWeight: 2,
+    strokeWeight: 1,
     fillColor: "#ADFF2F",
     fillOpacity: 0.4
   });
@@ -50,12 +52,13 @@ function myMap() {
  
  
         //Trying to make an instance for a nearby search of stores
-        var service = new google.maps.places.PlacesService(map);
-        service.nearbySearch({
+        var realScan = new google.maps.places.PlacesService(map);
+        realScan.nearbySearch({
           location: mapOptions.center,
-          radius: 700,
-          type: ['palce_of_interest']
+          radius: 3000,
+          type: ['store']
         }, getMarkerParameters);
+        realScan.setMap(map);
 
 }
 
@@ -75,11 +78,13 @@ function myMap() {
           position: place.geometry.location
         });
       }
+      
 
 
 </script>
 
-<script src="https://maps.googleapis.com/maps/api/js?callback=myMap"></script>
+
+<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBWZWWAhioLxprzA04NbE2bOpcq_-JYnis&libraries=places&callback=myMap" async defer></script>
 
 
 </body>
