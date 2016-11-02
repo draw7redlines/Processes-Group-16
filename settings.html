@@ -32,4 +32,41 @@
  
  }
  </script>
+ 
+ <br><br>
+ Filter based on type of attraction:
+ <br>
+ 
+ <input type= "checkbox" name="filter" value= "restaurant"> Restaurants <br>
+ <input type= "checkbox" name="filter" value= "monuments"> Monuments <br>
+ <input type= "checkbox" name="filter" value= "shopping centers"> Shopping Centers <br>
+ <input type= "checkbox" name="filter" value= "museums"> Museums <br>
+ <input type= "checkbox" name="filter" value= "busStops"> Bus Stops <br>
+ <input type= "checkbox" name="filter" value= "metroStations"> Metro Stops <br>
+ <br><br>
+ 
+ Should high traffic areas be disregarded?
+    <select name="traffic" id="traffic" value="No">
+        <option value= "No"> No </option>
+        <option value= "yes"> Yes </option>
+    </select>
+ <br><br>
+ 
+ Optimization: <br>
+ 
+ Only show places open right now: 
+    <select name="openOrNot" id="openOrNot" value="Yes">
+        <option value= "No"> No </option>
+        <option value = "Yes"> Yes </option>
+        </select>
+        <br>
+        
+ Only show the fastest route to desired destinations: 
+        <select name="onlyFastest" id="onlyFastest" value="No">
+        <option value="No"> No </option>
+        <option value="Yes"> Yes</option>
+        </select>
+        <br>
+ 
+ 
  </body>
