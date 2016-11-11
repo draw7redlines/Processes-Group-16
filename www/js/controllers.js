@@ -68,12 +68,12 @@ angular.module('starter.controllers', [])
                 //the radius is just a hard coded number for now
                 //this will eventually be linked to the settings the user
                 //adjusted to
-                radius: 200,
+                radius: 900,
                 strokeColor: "#008000",
                 strokeOpacity: 0.9,
                 strokeWeight: 1,
                 fillColor: "#ADFF2F",
-                fillOpacity: 0.4
+                fillOpacity: 0.2
             });
             
             scanRadiusDisplay.setMap(map);
