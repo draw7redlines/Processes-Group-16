@@ -41,6 +41,21 @@ angular.module('starter.controllers', [])
   };
 })
 
+
+.controller('SettingsCtrl', function($scope){
+    
+   // $scope.radiusInfo={
+     //   var radiusValue = document.getElementById("scanRadius").value;
+        
+       // var RadValue = {value : radiusValue};
+        
+    //}
+    
+    //console.log($scope.radiusInfo.RadValue);
+    
+})
+
+
 .controller('MapCtrl', function($scope, $ionicLoading) {
 
     $scope.initialise = function() {
@@ -70,7 +85,7 @@ angular.module('starter.controllers', [])
                 //adjusted to
                 radius: 900,
                 strokeColor: "#008000",
-                strokeOpacity: 0.9,
+                strokeOpacity: .9,
                 strokeWeight: 1,
                 fillColor: "#ADFF2F",
                 fillOpacity: 0.2
