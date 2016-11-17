@@ -63,10 +63,11 @@ angular.module('starter', ['ionic', 'starter.controllers'])
       url: '/settings',
       views: {
         'menuContent': {
-          templateUrl: 'templates/settings.html'
+          templateUrl: 'templates/settings.html',
+          controller: 'SettingsCtrl'
         }
       }
-    });
+    })
 
 
   // if none of the above states are matched, use this as the fallback
