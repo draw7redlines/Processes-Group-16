@@ -1,6 +1,6 @@
-angular.module('starter.controllers', [])
+angular.module('starter.controllers', ['ngCordova', 'ion-google-autocomplete'])
 
-.controller('AppCtrl', function($scope, $ionicModal, $timeout) {
+.controller('AppCtrl', function($scope, $ionicModal, $timeout, $cordovaGeolocation, SettingsUpdate) {
 
   // With the new view caching in Ionic, Controllers are only called
   // when they are recreated or on app start, instead of every page change.
@@ -9,54 +9,86 @@ angular.module('starter.controllers', [])
   //$scope.$on('$ionicView.enter', function(e) {
   //});
 
-  // Form data for the login modal
-  $scope.loginData = {};
+  $ionicModal.fromTemplateUrl('templates/modal.html', {
+        scope: $scope,
+        animation: 'slide-in-up'
+      }).then(function(modal) {
+        $scope.modal = modal;
+    });  
 
-  // Create the login modal that we will use later
-  $ionicModal.fromTemplateUrl('templates/login.html', {
-    scope: $scope
-  }).then(function(modal) {
-    $scope.modal = modal;
-  });
+    $scope.rangeValue = "8";
 
-  // Triggered in the login modal to close it
-  $scope.closeLogin = function() {
-    $scope.modal.hide();
-  };
+    $scope.update = function(value) {
+      SettingsUpdate.setRangeValue(value);
+      $scope.modal.hide();
+    };
 
-  // Open the login modal
-  $scope.login = function() {
-    $scope.modal.show();
-  };
+    $scope.openModal = function() {
+      $scope.modal.show();
+    };
+    $scope.closeModal = function() {
+      $scope.modal.hide();
+    };
+    // Cleanup the modal when we're done with it!
+    $scope.$on('$destroy', function() {
+      $scope.modal.remove();
+    });
+  
+  //finds current location and does a text search based on input
+  $scope.doSearch = function(v) {
 
-  // Perform the login action when the user submits the login form
-  $scope.doLogin = function() {
-    console.log('Doing login', $scope.loginData);
+    //window.localStorage.removeItem("data");
 
-    // Simulate a login delay. Remove this and replace with your login
-    // code if using a login system
-    $timeout(function() {
-      $scope.closeLogin();
-    }, 1000);
-  };
+    navigator.geolocation.getCurrentPosition(function(pos) {
+
+      var centerLocation = new google.maps.LatLng(pos.coords.latitude, pos.coords.longitude);
+
+      console.log(v);
+
+      var request = {
+          location: centerLocation,
+          radius: '500',
+          query: v
+      };
+      var map = new google.maps.Map(document.getElementById("map2"));
+      var service = new google.maps.places.PlacesService(map);
+                
+      service.textSearch(request, callback);
+    });
+  }
+
 })
 
+//controller for search page
+.controller('SearchCtrl', function($scope, $ionicModal, $cordovaGeolocation) {
 
-.controller('SettingsCtrl', function($scope){
-    
-   // $scope.radiusInfo={
-     //   var radiusValue = document.getElementById("scanRadius").value;
-        
-       // var RadValue = {value : radiusValue};
-        
-    //}
-    
-    //console.log($scope.radiusInfo.RadValue);
-    
+  $scope.data = {};
+
+  //get location from autocomplete input, store in local storage?
+  $scope.onAddressSelection = function(location) {
+    var a = location.address_components;
+    console.log("from search: " + JSON.stringify(a));
+
+    window.localStorage.setItem("autocompleteData", JSON.stringify(a));
+  }
+
+  $scope.loadData = function() {
+    alert(window.localStorage.getItem("data"));
+  }
+
+    //clear any leftover data
+  $scope.clearData = function(){
+    window.localStorage.removeItem("data");
+  }
+
 })
 
+//Map Controller
+.controller('MapCtrl', function($scope, $ionicLoading, SettingsUpdate) {
 
-.controller('MapCtrl', function($scope, $ionicLoading) {
+    $scope.loadData = function() {
+      alert(window.localStorage.getItem("data"));
+    }
 
     $scope.initialise = function() {
 
@@ -72,43 +104,114 @@ angular.module('starter.controllers', [])
             panControl: true,
             scaleControl:true,
             rotateControl: true
-            
         };
 
-        var map = new google.maps.Map(document.getElementById("map"), mapOptions);
+        var map = new google.maps.Map(document.getElementById("map3"), mapOptions);
         
+        //Times 1500 to account for whatever weird units google expects.
+        $scope.rangeValue = 1500*parseFloat(SettingsUpdate.getRangeValue());
+
         var scanRadiusDisplay = new google.maps.Circle(
             {
                 center: mapOptions.myLatlng,
-                //the radius is just a hard coded number for now
-                //this will eventually be linked to the settings the user
-                //adjusted to
-                radius: 900,
+                radius: $scope.rangeValue,
                 strokeColor: "#008000",
-                strokeOpacity: .9,
+                strokeOpacity: 0.9,
                 strokeWeight: 1,
                 fillColor: "#ADFF2F",
                 fillOpacity: 0.2
             });
             
-            scanRadiusDisplay.setMap(map);
+        scanRadiusDisplay.setMap(map);
+
+        //load data here
+        var dataString = window.localStorage.getItem("data");
+        //convert to json
+        var placesFound = JSON.parse(dataString);
+
+        console.log(placesFound);
             
 
         navigator.geolocation.getCurrentPosition(function(pos) {
             console.log(pos);
             map.setCenter(new google.maps.LatLng(pos.coords.latitude, pos.coords.longitude));
             scanRadiusDisplay.setCenter(new google.maps.LatLng(pos.coords.latitude, pos.coords.longitude));
+
             var myLocation = new google.maps.Marker({
                 position: new google.maps.LatLng(pos.coords.latitude, pos.coords.longitude),
                 map: map,
-                title: "My Location"
+                title: "My Location",
+                label: 'My Location'
             });
+
+            
+
+            //search location markers
+            for (var i=0; i<placesFound.length; i++){
+              
+              //var locationDetails = {name: placesFound[i].name, address: placesFound[i].formatted_address};
+              var locationDetails = placesFound[i].name;
+              console.log(locationDetails);
+
+              var marker = new google.maps.Marker({
+                map: $scope.map,
+                position: placesFound[i].geometry.location,
+                title: '<a target="_blank" href="https://www.youtube.com/results?search_query=' + locationDetails+ '">' + placesFound[i].name  + '</a>' + '<br>' + placesFound[i].formatted_address
+                //var scrt_var = placesFound[i].name;
+                //var strLink = "http://www.youtube.com/results?" + scrt_var;
+                //document.getElementById("link2").setAttribute("href",strLink);
+              });
+
+              
+              var infoWindow = new google.maps.InfoWindow();
+              
+              
+              google.maps.event.addListener(marker, 'click', function () {
+                  infoWindow.open($scope.map, marker);
+              });                  
+              
+              //set listener to open infowindow with marker title information
+              marker.addListener('click', function(){
+                infoWindow.setContent(this.title);
+                infoWindow.open($scope.map, this);
+              });
+            }
+            
+           
         });
 
         $scope.map = map;
     };
     
-    google.maps.event.addDomListener(document.getElementById("map"), 'load', $scope.initialise());
-    
+    google.maps.event.addDomListener(document.getElementById("map3"), 'load', $scope.initialise());
+
+    $scope.$on('eventFired', function(event, data) {
+        $scope.initialise();
+    })
+
+})
+
+//Browse Controller
+.controller("BrowseCtrl", function($scope) {
+
+  var a = window.localStorage.getItem("autocompleteData");
+  console.log("from browse: " + a);
 
 });
+
+function callback(results, status) {
+  //console.log(status);
+
+  if (status == google.maps.places.PlacesServiceStatus.OK) {
+    for (var i = 0; i < results.length; i++) {
+      var place = results[i];
+      //console.log(place);
+    }
+  }
+  else {
+    console.log("error");
+  }
+
+  //console.log(results);
+  window.localStorage.setItem("data", JSON.stringify(results));
+}
